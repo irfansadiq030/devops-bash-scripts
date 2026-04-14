@@ -3,7 +3,7 @@
 set -e
 
 # ===== CONFIG =====
-PHP_VERSION=${PHP_VERSION:-8.2}
+PHP_VERSION=${PHP_VERSION:-8.3}
 NODE_VERSION=${NODE_VERSION:-lts}
 INSTALL_MYSQL=${INSTALL_MYSQL:-true}
 INSTALL_NODE=${INSTALL_NODE:-true}
@@ -70,11 +70,37 @@ echo "⚡ Installing Laravel..."
 composer global require laravel/installer
 
 # ===== PATH =====
-COMPOSER_BIN=$(composer global config bin-dir --absolute)
+echo "🔗 Setting PATH..."
 
-grep -q "$COMPOSER_BIN" ~/.bashrc || echo "export PATH=\"$COMPOSER_BIN:\$PATH\"" >> ~/.bashrc
+COMPOSER_BIN_DIR=$(composer global config bin-dir --absolute 2>/dev/null || true)
 
-export PATH="$COMPOSER_BIN:$PATH"
+if [[ -z "$COMPOSER_BIN_DIR" ]]; then
+    if [[ -d "$HOME/.config/composer/vendor/bin" ]]; then
+        COMPOSER_BIN_DIR="$HOME/.config/composer/vendor/bin"
+    else
+        COMPOSER_BIN_DIR="$HOME/.composer/vendor/bin"
+    fi
+fi
+
+if ! grep -q "$COMPOSER_BIN_DIR" "$HOME/.bashrc"; then
+    echo "export PATH=\"$COMPOSER_BIN_DIR:\$PATH\"" >> "$HOME/.bashrc"
+fi
+
+export PATH="$COMPOSER_BIN_DIR:$PATH"
+source "$HOME/.bashrc" >/dev/null 2>&1 || true
+
+if command -v laravel >/dev/null 2>&1; then
+    laravel --version
+else
+    echo "❌ Laravel not found in PATH. Restart terminal or run: source ~/.bashrc"
+fi
+
+# Verify Laravel
+if command -v laravel >/dev/null 2>&1; then
+    laravel --version
+else
+    echo "❌ Laravel not found in PATH. Try restarting terminal."
+fi
 
 # ===== VERIFY =====
 if command -v laravel >/dev/null; then
