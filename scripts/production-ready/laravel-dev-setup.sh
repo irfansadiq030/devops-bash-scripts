@@ -14,26 +14,16 @@ echo "🚀 Setting up Laravel Dev Environment..."
 sudo apt update -y
 
 # ===== BASIC PACKAGES =====
+echo "📦 Installing basic dependencies..."
 sudo apt install -y curl unzip git software-properties-common
 
 # ===== PHP =====
 if ! command -v php >/dev/null; then
-    echo "🐘 Installing PHP $PHP_VERSION..."
-
-    sudo add-apt-repository ppa:ondrej/php -y
-    sudo apt update
-
-    sudo apt install -y \
-        php$PHP_VERSION \
-        php$PHP_VERSION-cli \
-        php$PHP_VERSION-mbstring \
-        php$PHP_VERSION-xml \
-        php$PHP_VERSION-bcmath \
-        php$PHP_VERSION-curl \
-        php$PHP_VERSION-mysql \
-        php$PHP_VERSION-zip
+    echo "❌ PHP is not installed. Please run your PHP setup script first."
+    exit 1
 fi
 
+echo "🐘 Using PHP version:"
 php -v
 
 # ===== COMPOSER =====
